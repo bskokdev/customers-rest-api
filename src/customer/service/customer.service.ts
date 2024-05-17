@@ -27,7 +27,7 @@ export class CustomerService {
       this.logger.error(`Customer with ID: ${id} not found.`);
       throw new NotFoundException(`Customer not found.`);
     }
-    this.logger.debug('Found customer: ', customer);
+    this.logger.debug('Found customer: ', JSON.stringify(customer, null, 2));
     return customer;
   }
 
