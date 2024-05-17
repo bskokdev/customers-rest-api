@@ -1,11 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Customer } from './model/customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasicCustomerInfo, CreateCustomerRequest } from './dto/customer-dto';
 import { customerToBasicInfo } from './mapper/customer.mapper';
 import { UUID } from '../shared/types/uuid.type';
-import { DatabaseRecordNotFound } from '../shared/types/errors.type';
 
 @Injectable()
 export class CustomerService {
@@ -25,7 +24,7 @@ export class CustomerService {
     const customer = await this.customerRepository.findOneBy({ id });
     if (!customer) {
       this.logger.error(`Customer with ID: ${id} not found.`);
-      throw new DatabaseRecordNotFound(`Customer not found.`);
+      throw new NotFoundException(`Customer not found.`);
     }
     this.logger.debug('Found customer: ', customer);
     return customer;
