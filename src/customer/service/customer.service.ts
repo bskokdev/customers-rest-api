@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Customer } from '../model/customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,13 +15,13 @@ export class CustomerService {
     private customerRepository: Repository<Customer>
   ) {}
 
-  async findAllBasicInfo(): Promise<BasicCustomerInfo[]> {
+  async findAllCustomerWithBasicInfo(): Promise<BasicCustomerInfo[]> {
     const customers = await this.customerRepository.find();
     this.logger.debug(`Found ${customers.length} customers`);
     return customers.map((customer: Customer) => customerToBasicInfo(customer));
   }
 
-  async findOneDetailedById(id: UUID): Promise<Customer> {
+  async findDetailedCustomerById(id: UUID): Promise<Customer> {
     const customer = await this.customerRepository.findOneBy({ id });
     if (!customer) {
       this.logger.error(`Customer with ID: ${id} not found.`);
@@ -31,7 +31,20 @@ export class CustomerService {
     return customer;
   }
 
+  async isAlreadyCreated(email: string, phone: string): Promise<boolean> {
+    const existingCustomer = await this.customerRepository.findOne({
+      where: [{ email }, { phone }],
+    });
+    return !!existingCustomer;
+  }
+
   async create(customer: CreateCustomerRequest): Promise<Customer> {
+    const { email, phone } = customer;
+    if (await this.isAlreadyCreated(email, phone)) {
+      this.logger.error(`Customer with ${email} or phone ${phone} already exists`);
+      throw new ConflictException(`Customer with email ${email} or phone ${phone} already exists`);
+    }
+
     const newCustomer = this.customerRepository.create(customer);
     const savedCustomer = await this.customerRepository.save(newCustomer);
     this.logger.debug(`Created a new customer with ID: ${savedCustomer.id}`);
@@ -40,6 +53,6 @@ export class CustomerService {
 
   async update(id: UUID, updatedCustomer: Partial<Customer>): Promise<Customer> {
     await this.customerRepository.update(id, updatedCustomer);
-    return this.findOneDetailedById(id);
+    return this.findDetailedCustomerById(id);
   }
 }

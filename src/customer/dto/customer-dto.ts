@@ -1,5 +1,5 @@
 import { UUID } from '../../shared/types/uuid.type';
-import { Customer } from '../model/customer.entity';
+import { IsEmail, IsPhoneNumber, IsString, Length } from 'class-validator';
 
 export interface BasicCustomerInfo {
   id: UUID;
@@ -7,4 +7,18 @@ export interface BasicCustomerInfo {
   lastName: string;
 }
 
-export type CreateCustomerRequest = Omit<Customer, 'id'>;
+export class CreateCustomerRequest {
+  @IsString()
+  @Length(1, 50)
+  firstName: string;
+
+  @IsString()
+  @Length(1, 50)
+  lastName: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsPhoneNumber(null)
+  phone: string;
+}
