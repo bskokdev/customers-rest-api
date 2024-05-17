@@ -1,10 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Customer } from './model/customer.entity';
+import { Customer } from '../model/customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BasicCustomerInfo, CreateCustomerRequest } from './dto/customer-dto';
-import { customerToBasicInfo } from './mapper/customer.mapper';
-import { UUID } from '../shared/types/uuid.type';
+import { BasicCustomerInfo, CreateCustomerRequest } from '../dto/customer-dto';
+import { customerToBasicInfo } from '../mapper/customer.mapper';
+import { UUID } from '../../shared/types/uuid.type';
 
 @Injectable()
 export class CustomerService {

@@ -12,10 +12,8 @@ import { Customer } from './customer/model/customer.entity';
       entities: [Customer],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([Customer]),
     CustomerModule,
   ],
   controllers: [AppController],
-  providers: [],
 })
 export class AppModule {}
