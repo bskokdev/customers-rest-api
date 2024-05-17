@@ -17,6 +17,7 @@ export class CustomerService {
 
   async findAllBasicInfo(): Promise<BasicCustomerInfo[]> {
     const customers = await this.customerRepository.find();
+    this.logger.debug(`Found ${customers.length} customers`);
     return customers.map((customer: Customer) => customerToBasicInfo(customer));
   }
 
