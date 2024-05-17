@@ -1,17 +1,4 @@
-import {
-  Body,
-  ConflictException,
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  NotFoundException,
-  Param,
-  Post,
-  Put,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CustomerService } from './service/customer.service';
 import { BasicCustomerInfo, CreateCustomerRequest } from './dto/customer-dto';
 import { UUID } from '../shared/types/uuid.type';
@@ -28,38 +15,17 @@ export class CustomerController {
 
   @Get(':id')
   async findOneDetailedById(@Param('id') id: UUID): Promise<Customer> {
-    try {
-      return await this.customerService.findDetailedCustomerById(id);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-      }
-      throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.customerService.findDetailedCustomerById(id);
   }
 
   @Post()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async create(@Body() createCustomerRequest: CreateCustomerRequest): Promise<Customer> {
-    try {
-      return await this.customerService.create(createCustomerRequest);
-    } catch (error) {
-      if (error instanceof ConflictException) {
-        throw error;
-      }
-      throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.customerService.create(createCustomerRequest);
   }
 
   @Put(':id')
   async update(@Param('id') id: UUID, @Body() updatedCustomer: Partial<Customer>): Promise<Customer> {
-    try {
-      return await this.customerService.update(id, updatedCustomer);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new HttpException(error.message, HttpStatus.NOT_FOUND);
-      }
-      throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.customerService.update(id, updatedCustomer);
   }
 }

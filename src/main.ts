@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as process from 'node:process';
 import * as dotenv from 'dotenv';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ApiExceptionFilterFilter } from './api-exception-filter/api-exception-filter.filter';
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const port = process.env.PORT || 3000;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new ApiExceptionFilterFilter());
   const config = new DocumentBuilder()
     .setTitle('Customers API')
     .setDescription('Basic customer CRUD demo')
