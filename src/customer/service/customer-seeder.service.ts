@@ -18,6 +18,7 @@ export class CustomerSeederService implements OnModuleInit {
   }
 
   async seed(): Promise<void> {
+    this.logger.debug('Seeding customer database table');
     for (let i = 0; i < 50; i++) {
       const mockCustomer = this.customerRepository.create({
         firstName: faker.person.firstName(),
