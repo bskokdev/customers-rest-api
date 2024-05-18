@@ -14,7 +14,9 @@ export class CustomerSeederService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    await this.seed();
+    if (process.env.NODE_ENV === 'development') {
+      await this.seed();
+    }
   }
 
   async seed(): Promise<void> {
