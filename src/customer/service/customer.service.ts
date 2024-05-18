@@ -61,18 +61,18 @@ export class CustomerService {
   }
 
   normalizeCustomerRequest<T extends CustomerRequest>(customer: T): T {
-    const normalized: any = {};
+    const normalized: Partial<CustomerRequest> = {};
 
-    if (customer.firstName !== undefined) {
+    if (customer.firstName) {
       normalized.firstName = customer.firstName.trim();
     }
-    if (customer.lastName !== undefined) {
+    if (customer.lastName) {
       normalized.lastName = customer.lastName.trim();
     }
-    if (customer.email !== undefined) {
+    if (customer.email) {
       normalized.email = customer.email.trim();
     }
-    if (customer.phone !== undefined) {
+    if (customer.phone) {
       normalized.phone = customer.phone.replace(/\s+/g, '').trim();
     }
 
