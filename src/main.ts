@@ -9,7 +9,7 @@ dotenv.config();
 
 const port = process.env.PORT || 3000;
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   app.useGlobalFilters(new ApiExceptionFilterFilter());
   const config = new DocumentBuilder()
