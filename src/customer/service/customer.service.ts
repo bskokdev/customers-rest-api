@@ -44,8 +44,9 @@ export class CustomerService {
   }
 
   async update(id: UUID, updatedCustomer: UpdateCustomerRequest): Promise<Customer> {
+    const normalizedUpdatedCustomer = this.normalizeCustomerRequest(updatedCustomer);
     const customer = await this.findDetailedCustomerById(id);
-    const { email, phone } = updatedCustomer;
+    const { email, phone } = normalizedUpdatedCustomer;
 
     if (email) {
       await this.checkIfEmailInUse(email, id);
@@ -54,7 +55,7 @@ export class CustomerService {
       await this.checkIfPhoneInUse(phone, id);
     }
 
-    Object.assign(customer, updatedCustomer);
+    Object.assign(customer, normalizedUpdatedCustomer);
     const savedCustomer = await this.customerRepository.save(customer);
     this.logger.debug(`Updated customer with ID: ${savedCustomer.id}`);
     return savedCustomer;
