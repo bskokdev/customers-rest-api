@@ -153,8 +153,8 @@ describe('CustomerService', () => {
     });
   });
 
-  describe('normalize customer requests', () => {
-    it('should normalize CreateCustomerRequest', () => {
+  describe('process customer requests', () => {
+    it('should process CreateCustomerRequest', () => {
       const input: CreateCustomerRequest = {
         firstName: ' John ',
         lastName: ' Doe ',
@@ -169,11 +169,11 @@ describe('CustomerService', () => {
         phone: '1234567890',
       };
 
-      const result = service.normalizeCustomerRequest(input);
+      const result = service.processCustomerRequest(input);
       expect(result).toEqual(expectedOutput);
     });
 
-    it('should normalize UpdateCustomerRequest', () => {
+    it('should process UpdateCustomerRequest', () => {
       const input: UpdateCustomerRequest = {
         firstName: ' Jane ',
         lastName: ' Smith ',
@@ -188,7 +188,7 @@ describe('CustomerService', () => {
         phone: '9876543210',
       };
 
-      const result = service.normalizeCustomerRequest(input);
+      const result = service.processCustomerRequest(input);
       expect(result).toEqual(expectedOutput);
     });
 
@@ -203,7 +203,7 @@ describe('CustomerService', () => {
         email: 'mike.jones@example.com',
       };
 
-      const result = service.normalizeCustomerRequest(input);
+      const result = service.processCustomerRequest(input);
       expect(result).toEqual(expectedOutput);
     });
   });

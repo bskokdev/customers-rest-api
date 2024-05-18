@@ -32,7 +32,7 @@ export class CustomerService {
   }
 
   async create(newIncomingCustomer: CreateCustomerRequest): Promise<Customer> {
-    const normalizedIncomingCustomer = this.normalizeCustomerRequest(newIncomingCustomer);
+    const normalizedIncomingCustomer = this.processCustomerRequest(newIncomingCustomer);
     const { email, phone } = normalizedIncomingCustomer;
     await this.checkIfEmailInUse(email);
     await this.checkIfPhoneInUse(phone);
@@ -44,7 +44,7 @@ export class CustomerService {
   }
 
   async update(id: UUID, updatedCustomer: UpdateCustomerRequest): Promise<Customer> {
-    const normalizedUpdatedCustomer = this.normalizeCustomerRequest(updatedCustomer);
+    const normalizedUpdatedCustomer = this.processCustomerRequest(updatedCustomer);
     const customer = await this.findDetailedCustomerById(id);
     const { email, phone } = normalizedUpdatedCustomer;
 
@@ -61,7 +61,7 @@ export class CustomerService {
     return savedCustomer;
   }
 
-  normalizeCustomerRequest<T extends CustomerRequest>(customer: T): T {
+  processCustomerRequest<T extends CustomerRequest>(customer: T): T {
     const normalized: Partial<CustomerRequest> = {};
 
     if (customer.firstName) {
@@ -70,13 +70,16 @@ export class CustomerService {
     if (customer.lastName) {
       normalized.lastName = customer.lastName.trim();
     }
+    // CustomerRequest email and phone fields do not accept a trailing space in the request
+    // The reason for that is that the pipe checks are done via isEmail() and isPhoneNumber() annotations
+    // The field will not pass such check if it contains a trailing space and an InvalidRequest response is returned
     if (customer.email) {
       normalized.email = customer.email.trim();
     }
     if (customer.phone) {
       normalized.phone = customer.phone.replace(/\s+/g, '').trim();
     }
-
+    this.logger.debug('Processed CustomerRequest: ', JSON.stringify(normalized, null, 2));
     return normalized as T;
   }
 
