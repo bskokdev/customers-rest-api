@@ -8,6 +8,7 @@ import { ApiExceptionFilterFilter } from './api-exception-filter/api-exception-f
 dotenv.config();
 
 const port = process.env.PORT || 3000;
+const swaggerUrlPath = process.env.SWAGGER_PATH || 'api';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -19,7 +20,7 @@ async function bootstrap(): Promise<void> {
     .addTag('customers')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup(swaggerUrlPath, app, document);
   await app.listen(port);
 }
 
