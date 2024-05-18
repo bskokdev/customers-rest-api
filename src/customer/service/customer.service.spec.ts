@@ -152,4 +152,59 @@ describe('CustomerService', () => {
       await expect(service.update(mockCustomer.id, updatedCustomer)).rejects.toThrow(ConflictException);
     });
   });
+
+  describe('normalize customer requests', () => {
+    it('should normalize CreateCustomerRequest', () => {
+      const input: CreateCustomerRequest = {
+        firstName: ' John ',
+        lastName: ' Doe ',
+        email: ' john.doe@example.com ',
+        phone: ' 123 456 7890 ',
+      };
+
+      const expectedOutput: CreateCustomerRequest = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com',
+        phone: '1234567890',
+      };
+
+      const result = service.normalizeCustomerRequest(input);
+      expect(result).toEqual(expectedOutput);
+    });
+
+    it('should normalize UpdateCustomerRequest', () => {
+      const input: UpdateCustomerRequest = {
+        firstName: ' Jane ',
+        lastName: ' Smith ',
+        email: ' jane.smith@example.com ',
+        phone: ' 987 654 3210 ',
+      };
+
+      const expectedOutput: UpdateCustomerRequest = {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane.smith@example.com',
+        phone: '9876543210',
+      };
+
+      const result = service.normalizeCustomerRequest(input);
+      expect(result).toEqual(expectedOutput);
+    });
+
+    it('should handle partial UpdateCustomerRequest', () => {
+      const input: UpdateCustomerRequest = {
+        firstName: ' Mike ',
+        email: ' mike.jones@example.com ',
+      };
+
+      const expectedOutput: UpdateCustomerRequest = {
+        firstName: 'Mike',
+        email: 'mike.jones@example.com',
+      };
+
+      const result = service.normalizeCustomerRequest(input);
+      expect(result).toEqual(expectedOutput);
+    });
+  });
 });

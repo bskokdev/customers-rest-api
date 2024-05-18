@@ -42,3 +42,5 @@ export class UpdateCustomerRequest {
   @IsPhoneNumber(null)
   phone?: string;
 }
+
+export type CustomerRequest = CreateCustomerRequest | UpdateCustomerRequest;

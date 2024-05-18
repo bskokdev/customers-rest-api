@@ -2,7 +2,7 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 import { Not, Repository } from 'typeorm';
 import { Customer } from '../model/customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BasicCustomerInfo, CreateCustomerRequest, UpdateCustomerRequest } from '../dto/customer-dto';
+import { BasicCustomerInfo, CreateCustomerRequest, CustomerRequest, UpdateCustomerRequest } from '../dto/customer-dto';
 import { customerToBasicInfo } from '../mapper/customer.mapper';
 import { UUID } from '../../shared/types/uuid.type';
 
@@ -32,7 +32,7 @@ export class CustomerService {
   }
 
   async create(newIncomingCustomer: CreateCustomerRequest): Promise<Customer> {
-    const normalizedIncomingCustomer = this.normalizeCreateDTO(newIncomingCustomer);
+    const normalizedIncomingCustomer = this.normalizeCustomerRequest(newIncomingCustomer);
     const { email, phone } = normalizedIncomingCustomer;
     await this.checkIfEmailInUse(email);
     await this.checkIfPhoneInUse(phone);
@@ -60,13 +60,23 @@ export class CustomerService {
     return savedCustomer;
   }
 
-  private normalizeCreateDTO(customer: CreateCustomerRequest): CreateCustomerRequest {
-    return {
-      firstName: customer.firstName.trim(),
-      lastName: customer.lastName.trim(),
-      email: customer.email.trim(),
-      phone: customer.phone.replace(/\s+/g, '').trim(),
-    };
+  normalizeCustomerRequest<T extends CustomerRequest>(customer: T): T {
+    const normalized: any = {};
+
+    if (customer.firstName !== undefined) {
+      normalized.firstName = customer.firstName.trim();
+    }
+    if (customer.lastName !== undefined) {
+      normalized.lastName = customer.lastName.trim();
+    }
+    if (customer.email !== undefined) {
+      normalized.email = customer.email.trim();
+    }
+    if (customer.phone !== undefined) {
+      normalized.phone = customer.phone.replace(/\s+/g, '').trim();
+    }
+
+    return normalized as T;
   }
 
   private async checkIfEmailInUse(email: string, excludeId?: UUID): Promise<void> {
