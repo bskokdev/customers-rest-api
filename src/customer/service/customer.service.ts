@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { BasicCustomerInfo, CreateCustomerRequest } from '../dto/customer-dto';
 import { customerToBasicInfo } from '../mapper/customer.mapper';
 import { UUID } from '../../shared/types/uuid.type';
-import { CommandUtils } from 'typeorm/commands/CommandUtils';
 
 @Injectable()
 export class CustomerService {
