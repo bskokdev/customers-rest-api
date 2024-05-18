@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CustomerService } from './customer.service';
 import { Customer } from '../model/customer.entity';
-import { CreateCustomerRequest } from '../dto/customer-dto';
+import { CreateCustomerRequest, UpdateCustomerRequest } from '../dto/customer-dto';
 import { customerToBasicInfo } from '../mapper/customer.mapper';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -116,7 +116,7 @@ describe('CustomerService', () => {
 
   describe('update', () => {
     it('should update and return an existing customer', async () => {
-      const updatedCustomer: Partial<Customer> = {
+      const updatedCustomer: UpdateCustomerRequest = {
         firstName: 'Jane',
         email: 'jane.doe@example.com',
       };
@@ -131,13 +131,13 @@ describe('CustomerService', () => {
     });
 
     it('should throw NotFoundException if customer not found', async () => {
-      const updatedCustomer: Partial<Customer> = { firstName: 'Jane' };
+      const updatedCustomer: UpdateCustomerRequest = { firstName: 'Jane' };
       repository.findOneBy.mockResolvedValue(null);
       await expect(service.update(mockCustomer.id, updatedCustomer)).rejects.toThrow(NotFoundException);
     });
 
     it('should throw ConflictException if email is in use', async () => {
-      const updatedCustomer: Partial<Customer> = { email: 'new.email@example.com' };
+      const updatedCustomer: UpdateCustomerRequest = { email: 'new.email@example.com' };
       repository.findOneBy.mockResolvedValue(mockCustomer);
       repository.findOne.mockResolvedValue({ ...mockCustomer, id: uuidv4() });
 
@@ -145,7 +145,7 @@ describe('CustomerService', () => {
     });
 
     it('should throw ConflictException if phone is in use', async () => {
-      const updatedCustomer: Partial<Customer> = { phone: '0987654321' };
+      const updatedCustomer: UpdateCustomerRequest = { phone: '0987654321' };
       repository.findOneBy.mockResolvedValue(mockCustomer);
       repository.findOne.mockResolvedValue({ ...mockCustomer, id: uuidv4() });
 

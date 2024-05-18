@@ -2,7 +2,7 @@ import { ConflictException, Injectable, Logger, NotFoundException } from '@nestj
 import { Not, Repository } from 'typeorm';
 import { Customer } from '../model/customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BasicCustomerInfo, CreateCustomerRequest } from '../dto/customer-dto';
+import { BasicCustomerInfo, CreateCustomerRequest, UpdateCustomerRequest } from '../dto/customer-dto';
 import { customerToBasicInfo } from '../mapper/customer.mapper';
 import { UUID } from '../../shared/types/uuid.type';
 
@@ -43,12 +43,16 @@ export class CustomerService {
     return savedCustomer;
   }
 
-  async update(id: UUID, updatedCustomer: Partial<Customer>): Promise<Customer> {
+  async update(id: UUID, updatedCustomer: UpdateCustomerRequest): Promise<Customer> {
     const customer = await this.findDetailedCustomerById(id);
     const { email, phone } = updatedCustomer;
 
-    await this.checkIfEmailInUse(email, id);
-    await this.checkIfPhoneInUse(phone, id);
+    if (email) {
+      await this.checkIfEmailInUse(email, id);
+    }
+    if (phone) {
+      await this.checkIfPhoneInUse(phone, id);
+    }
 
     Object.assign(customer, updatedCustomer);
     const savedCustomer = await this.customerRepository.save(customer);

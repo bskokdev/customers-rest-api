@@ -1,5 +1,5 @@
 import { UUID } from '../../shared/types/uuid.type';
-import { IsEmail, IsPhoneNumber, IsString, Length } from 'class-validator';
+import { IsEmail, IsOptional, IsPhoneNumber, IsString, Length } from 'class-validator';
 
 export interface BasicCustomerInfo {
   id: UUID;
@@ -21,4 +21,24 @@ export class CreateCustomerRequest {
 
   @IsPhoneNumber(null)
   phone: string;
+}
+
+export class UpdateCustomerRequest {
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  firstName?: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  lastName?: string;
+
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsPhoneNumber(null)
+  phone?: string;
 }
