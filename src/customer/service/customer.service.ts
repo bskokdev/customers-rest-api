@@ -31,7 +31,7 @@ export class CustomerService {
 
   /**
    * Finds the customer by id. In this case the Customer entity is returned to provide all the details.
-   * @param id - Customer's id.
+   * @param id - ID of a customer to be found.
    * @throws NotFoundException - If the customer isn't found.
    * @returns Promise<Customer> - Resolves if customer is found, rejects if not.
    */
