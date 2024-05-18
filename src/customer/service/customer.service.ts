@@ -6,6 +6,9 @@ import { BasicCustomerInfo, CreateCustomerRequest, CustomerRequest, UpdateCustom
 import { customerToBasicInfo } from '../mapper/customer.mapper';
 import { UUID } from '../../shared/types/uuid.type';
 
+/**
+ * Handles all the customer related business logic which can be injected to other services or controllers.
+ */
 @Injectable()
 export class CustomerService {
   private readonly logger = new Logger(CustomerService.name);
@@ -15,12 +18,23 @@ export class CustomerService {
     private customerRepository: Repository<Customer>
   ) {}
 
+  /**
+   * Finds an array of basic customer information.
+   * The DTO is constructed via a mapper to provide a cleaner response instead of returning the entity itself.
+   * @returns Promise<BasicCustomerInfo[]> - Resolves after finding and mapping all customer information.
+   */
   async findAllCustomerWithBasicInfo(): Promise<BasicCustomerInfo[]> {
     const customers = await this.customerRepository.find();
     this.logger.debug(`Found ${customers.length} customers`);
     return customers.map((customer: Customer) => customerToBasicInfo(customer));
   }
 
+  /**
+   * Finds the customer by id. In this case the Customer entity is returned to provide all the details.
+   * @param id - Customer's id.
+   * @throws NotFoundException - If the customer isn't found.
+   * @returns Promise<Customer> - Resolves if customer is found, rejects if not.
+   */
   async findDetailedCustomerById(id: UUID): Promise<Customer> {
     const customer = await this.customerRepository.findOneBy({ id });
     if (!customer) {
@@ -31,6 +45,14 @@ export class CustomerService {
     return customer;
   }
 
+  /**
+   * Creates a new Customer record in the database from the incoming request DTO.
+   * @param newIncomingCustomer - Request DTO which doesn't contain the ID (as it's auto generated).
+   * @throws ConflictException -
+   *  If the email or phone number are already used.
+   *  This is propagated from checkIfEmailInUse and checkIfPhoneInUse methods.
+   * @returns Promise<Customer> - Resolves if customer is saved correctly, rejects if email or phone is already used.
+   */
   async create(newIncomingCustomer: CreateCustomerRequest): Promise<Customer> {
     const normalizedIncomingCustomer = this.processCustomerRequest(newIncomingCustomer);
     const { email, phone } = normalizedIncomingCustomer;
@@ -43,6 +65,15 @@ export class CustomerService {
     return savedCustomer;
   }
 
+  /**
+   * Updates and saves the customer information for a customer found by the provided ID.
+   * Also checks if email or phone number are already used by another customer.
+   * @param id - ID of the customer to be updated.
+   * @param updatedCustomer - Body of the customer which has to be updated.
+   * @throws ConflictException - If email or phone is used by another customer.
+   * @returns Promise<Customer> -
+   *   Resolves if customer is saved correctly, rejects if the email or phone is already used, or user is not found by ID.
+   */
   async update(id: UUID, updatedCustomer: UpdateCustomerRequest): Promise<Customer> {
     const normalizedUpdatedCustomer = this.processCustomerRequest(updatedCustomer);
     const customer = await this.findDetailedCustomerById(id);
@@ -61,28 +92,40 @@ export class CustomerService {
     return savedCustomer;
   }
 
+  /**
+   * Processes CustomerRequest in order to keep consistent data entries.
+   * Prefix and suffix spaces are removed, as well as spaces within the phone number.
+   * @param customer - CustomerRequest to be processed.
+   * @return CustomerRequest - Processed CustomerRequest with trimmed spaces.
+   */
   processCustomerRequest<T extends CustomerRequest>(customer: T): T {
-    const normalized: Partial<CustomerRequest> = {};
+    const processed: Partial<CustomerRequest> = {};
 
     if (customer.firstName) {
-      normalized.firstName = customer.firstName.trim();
+      processed.firstName = customer.firstName.trim();
     }
     if (customer.lastName) {
-      normalized.lastName = customer.lastName.trim();
+      processed.lastName = customer.lastName.trim();
     }
     // CustomerRequest email and phone fields do not accept a trailing space in the request
     // The reason for that is that the pipe checks are done via isEmail() and isPhoneNumber() annotations
     // The field will not pass such check if it contains a trailing space and an InvalidRequest response is returned
     if (customer.email) {
-      normalized.email = customer.email.trim();
+      processed.email = customer.email.trim();
     }
     if (customer.phone) {
-      normalized.phone = customer.phone.replace(/\s+/g, '').trim();
+      processed.phone = customer.phone.replace(/\s+/g, '').trim();
     }
-    this.logger.debug('Processed CustomerRequest: ', JSON.stringify(normalized, null, 2));
-    return normalized as T;
+    this.logger.debug('Processed CustomerRequest: ', JSON.stringify(processed, null, 2));
+    return processed as T;
   }
 
+  /**
+   * Checks if an email is already in use by another customer, excluding a specific customer by ID if provided.
+   * @param email - The email address to check.
+   * @param [excludeId] - The ID of the customer to exclude from the check.
+   * @throws ConflictException If the email is already in use by another customer.
+   */
   private async checkIfEmailInUse(email: string, excludeId?: UUID): Promise<void> {
     const whereClause = excludeId ? { email, id: Not(excludeId) } : { email };
     const existingCustomerWithEmail = await this.customerRepository.findOne({ where: whereClause });
@@ -92,6 +135,12 @@ export class CustomerService {
     }
   }
 
+  /**
+   * Checks if a phone number is already in use by another customer, excluding a specific customer by ID if provided.
+   * @param phone - The phone number to check.
+   * @param [excludeId] - The ID of the customer to exclude from the check.
+   * @throws ConflictException If the phone number is already in use by another customer.
+   */
   private async checkIfPhoneInUse(phone: string, excludeId?: UUID): Promise<void> {
     const whereClause = excludeId ? { phone, id: Not(excludeId) } : { phone };
     const existingCustomerWithPhone = await this.customerRepository.findOne({ where: whereClause });

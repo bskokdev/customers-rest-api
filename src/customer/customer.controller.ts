@@ -4,6 +4,9 @@ import { BasicCustomerInfo, CreateCustomerRequest, UpdateCustomerRequest } from 
 import { UUID } from '../shared/types/uuid.type';
 import { Customer } from './model/customer.entity';
 
+/**
+ * Core REST controller of the Customer module exposing customer related endpoints.
+ */
 @Controller('customers')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
