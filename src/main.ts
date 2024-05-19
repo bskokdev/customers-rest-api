@@ -17,7 +17,6 @@ async function bootstrap(): Promise<void> {
     .setTitle('Customers API')
     .setDescription('Basic customer CRUD demo')
     .setVersion('1.0')
-    .addTag('customers')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(swaggerUrlPath, app, document);
