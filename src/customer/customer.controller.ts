@@ -21,6 +21,10 @@ export class CustomerController {
     return this.customerService.findDetailedCustomerById(id);
   }
 
+  /*
+   * Create and Update will throw an invalid request response if the email or phone number are not valid.
+   * It's due to the use of class validators instead implementing the validation myself for simplicity.
+   * */
   @Post()
   @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
   async create(@Body() createCustomerRequest: CreateCustomerRequest): Promise<Customer> {
