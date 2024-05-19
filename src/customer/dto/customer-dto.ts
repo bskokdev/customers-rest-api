@@ -1,5 +1,6 @@
 import { UUID } from '../../shared/types/uuid.type';
 import { IsEmail, IsOptional, IsPhoneNumber, IsString, Length } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * Data payload containing only basic information about the customer.
@@ -16,16 +17,20 @@ export interface BasicCustomerInfo {
 export class CreateCustomerRequest {
   @IsString()
   @Length(1, 50)
+  @ApiProperty()
   firstName: string;
 
   @IsString()
   @Length(1, 50)
+  @ApiProperty()
   lastName: string;
 
   @IsEmail()
+  @ApiProperty()
   email: string;
 
   @IsPhoneNumber(null)
+  @ApiProperty()
   phone: string;
 }
 
@@ -37,19 +42,23 @@ export class UpdateCustomerRequest {
   @IsOptional()
   @IsString()
   @Length(1, 50)
+  @ApiProperty()
   firstName?: string;
 
   @IsOptional()
   @IsString()
   @Length(1, 50)
+  @ApiProperty()
   lastName?: string;
 
   @IsOptional()
   @IsEmail()
+  @ApiProperty()
   email?: string;
 
   @IsOptional()
   @IsPhoneNumber(null)
+  @ApiProperty()
   phone?: string;
 }
 
