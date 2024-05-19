@@ -30,7 +30,7 @@ or via `npm`
 npm install
 ```
 
-Create a `.env` file in the `/src` directory.
+Create a `.env` file in the project root directory.
 
 Available Variables
 
